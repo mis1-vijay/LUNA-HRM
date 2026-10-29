@@ -1,36 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { API_BASE_URL } from '../../API/apiClient'
 import { Link, useParams } from 'react-router-dom'
+import { API_BASE_URL, tokenHeaders } from '../../API/apiClient'
 import Sidebar from './Sidebar'
 
 function SingleJob () {
-  const [jobDetails, setJobDetails] = useState('')
+  const [jobDetails, setJobDetails] = useState({})
   const { id } = useParams()
 
-  const handleJob = async () => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/v1/single-job/${id}`,
-        {
+  useEffect(() => {
+    const handleJob = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/single-job/${id}`, {
           withCredentials: true,
           headers: {
             Accept: 'application/json',
-            Authorization: `Bearer ${JSON.parse(
-              localStorage.getItem('userToken')
-            )}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...tokenHeaders('userToken')
           }
-        }
-      )
-      console.log(response.data)
-      setJobDetails(response.data.singleJob)
-    } catch (err) {
-      console.log(err)
+        })
+        setJobDetails(response.data.singleJob)
+      } catch (error) {
+        console.error('Unable to load job details:', error)
+      }
     }
-  }
 
-  useEffect(() => {
     handleJob()
   }, [id])
 
@@ -43,7 +37,7 @@ function SingleJob () {
         <p>{jobDetails.companyName}</p>
         <p>{jobDetails.startDate}</p>
         <p>{jobDetails.endDate}</p>
-        <Link className='btn btn-primary' to={`/dashboard/apply-job/${jobDetails._id}`}>Apply Now</Link>
+        <Link className='btn btn-primary' to={`/dashboard/apply-job/${jobDetails.id || jobDetails._id}`}>Apply Now</Link>
       </div>
     </div>
   )

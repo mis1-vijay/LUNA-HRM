@@ -1,61 +1,103 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
+import PropTypes from 'prop-types'
 import UserContext from './userContext'
 import axios from 'axios'
-import { API_BASE_URL } from '../API/apiClient'
+import {
+  API_BASE_URL,
+  apiRequestConfig,
+  clearAuthenticatedAccount,
+  readStoredAccount,
+  readStoredToken,
+  storeAuthenticatedAccount
+} from '../API/apiClient'
+
+const isApplicant = account => account?.role === 'APPLICANT'
+const isAdminRole = account =>
+  ['ADMIN', 'HR_MANAGER', 'DEPARTMENT_MANAGER'].includes(account?.role)
 
 function UserContextProvider ({ children }) {
-  const [user, setUser] = useState(null)
-  const [admin, setAdmin] = useState(null)
+  const [account, setAccount] = useState(readStoredAccount)
   const [getJob, setGetJob] = useState(null)
-  const [authUser, setAuthUser] = useState(
-    JSON.parse(localStorage.getItem('userToken'))
-  )
-  const [authAdmin, setAuthAdmin] = useState(
-    JSON.parse(localStorage.getItem('adminToken'))
-  )
+  const [authUser, setAuthUser] = useState(() => readStoredToken('userToken'))
+  const [authAdmin, setAuthAdmin] = useState(() => readStoredToken('adminToken'))
+  const [authEmployee, setAuthEmployee] = useState(() => readStoredToken('employeeToken'))
 
-  useEffect(() => {
-    const storedUserToken = JSON.parse(localStorage.getItem('userToken'))
-    if (storedUserToken !== authUser) {
-      setAuthUser(storedUserToken)
-    }
-  }, [])
+  const setUser = nextAccount => {
+    const storedAccount = storeAuthenticatedAccount(nextAccount)
+    setAccount(storedAccount)
+    setAuthUser(readStoredToken('userToken'))
+    setAuthAdmin(null)
+    setAuthEmployee(null)
+  }
 
-  useEffect(() => {
-    const storedAdminToken = JSON.parse(localStorage.getItem('adminToken'))
-    if (storedAdminToken !== authAdmin) {
-      setAuthAdmin(storedAdminToken)
-    }
-  }, [])
+  const setAdmin = nextAccount => {
+    const storedAccount = storeAuthenticatedAccount(nextAccount)
+    setAccount(storedAccount)
+    setAuthUser(null)
+    setAuthAdmin(readStoredToken('adminToken'))
+    setAuthEmployee(null)
+  }
 
-  const BASE_URL = API_BASE_URL
+  const setEmployee = nextAccount => {
+    const storedAccount = storeAuthenticatedAccount(nextAccount)
+    setAccount(storedAccount)
+    setAuthUser(null)
+    setAuthAdmin(null)
+    setAuthEmployee(readStoredToken('employeeToken'))
+  }
 
   const logout = async () => {
     try {
-      await axios.post(`${BASE_URL}/api/v1/user-logout`, null, {
-        withCredentials: true
+      await axios.post(`${API_BASE_URL}/user-logout`, null, {
+        ...apiRequestConfig('userToken')
       })
-      setAuthUser(null)
-      localStorage.removeItem('userToken')
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error('Logout request failed:', error)
+    } finally {
+      localStorage.removeItem('userToken')
+      clearAuthenticatedAccount()
+      setAuthUser(null)
+      setAccount(null)
     }
   }
+
   const logoutAdmin = async () => {
     try {
-      await axios.post(`${BASE_URL}/api/v1/admin-logout`, null, {
+      await axios.post(`${API_BASE_URL}/admin-logout`, null, {
         withCredentials: true
       })
-      setAuthAdmin(null)
-      localStorage.removeItem('adminToken')
-      localStorage.removeItem('accountRole')
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error('Logout request failed:', error)
+    } finally {
+      localStorage.removeItem('adminToken')
+      localStorage.removeItem('employeeToken')
+      clearAuthenticatedAccount()
+      setAuthAdmin(null)
+      setAuthEmployee(null)
+      setAccount(null)
     }
   }
+
   return (
     <UserContext.Provider
-      value={{ user, setUser, logout, authUser, logoutAdmin, admin, setAdmin, setGetJob, getJob }}
+      value={{
+        user: isApplicant(account) ? account : null,
+        admin: isAdminRole(account) ? account : null,
+        currentAccount: account,
+        setUser,
+        setAdmin,
+        setEmployee,
+        logout,
+        logoutAdmin,
+        authUser,
+        authAdmin,
+        authEmployee,
+        setAuthUser,
+        setAuthAdmin,
+        setAuthEmployee,
+        setGetJob,
+        getJob
+      }}
     >
       {children}
     </UserContext.Provider>
@@ -63,3 +105,7 @@ function UserContextProvider ({ children }) {
 }
 
 export default UserContextProvider
+
+UserContextProvider.propTypes = {
+  children: PropTypes.node.isRequired
+}

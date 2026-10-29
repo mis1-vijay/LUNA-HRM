@@ -1,5 +1,59 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const prisma = require('../Database/prisma')
+
+const authCookieOptions = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 24 * 60 * 60 * 1000
+}
+
+const employeeLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ success: false, message: 'Email and password are required.' })
+    }
+
+    const account = await prisma.account.findUnique({
+      where: { email: email.trim().toLowerCase() },
+      include: { employeeProfile: true }
+    })
+    if (!account || account.status !== 'ACTIVE' || account.role !== 'EMPLOYEE' ||
+      !account.employeeProfile || !(await bcrypt.compare(password, account.passwordHash))) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password.' })
+    }
+
+    const token = jwt.sign(
+      { id: account.id, role: account.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    )
+    await prisma.account.update({ where: { id: account.id }, data: { lastLogin: new Date() } })
+    res.cookie('employeeId', account.id, authCookieOptions)
+    return res.status(200).json({
+      success: true,
+      message: 'Employee Login Successfully',
+      isEmployee: {
+        id: account.id,
+        _id: account.id,
+        email: account.email,
+        name: account.name,
+        firstName: account.firstName,
+        lastName: account.lastName,
+        role: account.role,
+        status: account.status,
+        departmentId: account.departmentId,
+        employeeId: account.employeeProfile.id,
+        employeeNumber: account.employeeProfile.employeeId
+      },
+      token
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
 
 const employeeSelect = {
   id: true,
@@ -289,6 +343,7 @@ const getDepartmentStats = async (req, res, next) => {
 }
 
 module.exports = {
+  employeeLogin,
   createEmployee,
   getAllEmployees,
   getEmployeeById,

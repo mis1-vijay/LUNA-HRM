@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     MDBCard,
     MDBCardBody,
@@ -16,7 +16,7 @@ import {
 } from 'mdb-react-ui-kit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from '../../../API/apiClient';
+import { API_BASE_URL, readStoredToken } from '../../../API/apiClient';
 
 const LunaHRDashboard = () => {
     const [dashboardData, setDashboardData] = useState(null);
@@ -29,9 +29,9 @@ const LunaHRDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const token = JSON.parse(localStorage.getItem('adminToken'));
+            const token = readStoredToken('adminToken');
             const response = await axios.get(
-                `${API_BASE_URL}/api/v1/dashboard/hr`,
+                `${API_BASE_URL}/dashboard/hr`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -66,16 +66,6 @@ const LunaHRDashboard = () => {
     const attendanceApprovalStats = dashboardData?.attendanceApprovalStats || [];
     const pendingLeaves = dashboardData?.pendingLeaves || [];
     const pendingAttendances = dashboardData?.pendingAttendances || [];
-
-    const getStatusBadge = (status) => {
-        const statusMap = {
-            pending: { bg: 'warning', icon: 'hourglass-half' },
-            approved: { bg: 'success', icon: 'check-circle' },
-            rejected: { bg: 'danger', icon: 'times-circle' },
-            cancelled: { bg: 'secondary', icon: 'ban' }
-        };
-        return statusMap[status] || { bg: 'secondary', icon: 'question-circle' };
-    };
 
     return (
         <div className="luna-hr-dashboard p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     MDBCard,
     MDBCardBody,
@@ -21,23 +21,23 @@ import {
 } from 'mdb-react-ui-kit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from '../../API/apiClient';
+import { API_BASE_URL, readStoredToken } from '../../API/apiClient';
 
-const LunaEmployeeDashboard = ({ employeeId }) => {
+const LunaEmployeeDashboard = () => {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
 
     useEffect(() => {
         fetchDashboardData();
-    }, [employeeId]);
+    }, []);
 
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const token = JSON.parse(localStorage.getItem('adminToken'));
+            const token = readStoredToken('employeeToken');
             const response = await axios.get(
-                `${API_BASE_URL}/api/v1/dashboard/employee`,
+                `${API_BASE_URL}/dashboard/employee`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,

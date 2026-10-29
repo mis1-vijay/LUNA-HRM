@@ -1,5 +1,4 @@
-import React from 'react'
-import { BsGithub, BsLinkedin, BsTwitter } from 'react-icons/bs'
+import { BsGithub, BsLinkedin } from 'react-icons/bs'
 import { FaWhatsapp } from 'react-icons/fa'
 import myPics from '../../Assets/Images/profileme.png'
 import simonPics from '../../Assets/Images/dev_simon-removebg-preview.png'
@@ -17,7 +16,7 @@ function Team () {
           <p>
             <img width={'200px'} src={myPics} alt='my-image' />
           </p>
-          <p classname='fw-bold'>Quadri Kobiowu</p>
+          <p className='fw-bold'>Quadri Kobiowu</p>
           <h4>Fullstack Developer</h4>
           <p style={{ fontStyle: 'italic' }}>
             <em>
@@ -67,11 +66,11 @@ function Team () {
           <p>
             <img width={'200px'} src={simonPics} alt='my-image' />
           </p>
-          <p classname='fw-bold'>Simon Azike</p>
+          <p className='fw-bold'>Simon Azike</p>
           <h4>Project Manager</h4>
           <p style={{ fontStyle: 'italic' }}>
             <em>
-              <q>Proficient in programming languages like Python, JavaScript, HTML, and CSS, capable of working independently or in a team. Experienced software project management with high energy, excellent communication skills, Linux administration, and interest in technology trends.</q>
+              <q>Proficient in programming languages like Python, JavaScript, HTML, and CSS, capable of working independently or in a team. Experienced software project management with high energy, excellent communication skills, Linux administration, and interest in technology trends.</q>
             </em>
           </p>
           <div className='social-media d-flex gap-4'>

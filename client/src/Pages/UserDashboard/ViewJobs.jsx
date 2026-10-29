@@ -1,4 +1,3 @@
-import React from 'react'
 import Sidebar from './Sidebar'
 import Jobs from '../../Components/Jobs/Jobs'
 

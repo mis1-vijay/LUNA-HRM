@@ -10,12 +10,12 @@ const verifyToken = async (req, res, next) => {
   if (!token) {
     return res.status(401).json({ auth: false, message: 'Authentication required.' })
   }
-  if (!process.env.SECRET) {
-    return next(new Error('SECRET is not configured'))
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+    return next(new Error('JWT_SECRET must be configured with at least 32 characters.'))
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
     if (!decoded || typeof decoded !== 'object' || typeof decoded.id !== 'string') {
       return res.status(401).json({ auth: false, message: 'Invalid authentication token.' })
     }

@@ -1,25 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { API_BASE_URL } from '../../API/apiClient'
 
 function RecentJobs () {
   const [recentJob, setRecentJobs] = useState([])
+  const [loadError, setLoadError] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  const handleRecentJobs = async () => {
+  const handleRecentJobs = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/v1/recent-jobs`,
-        {
-          withCredentials: true
-        }
-      )
-      console.log(response.data)
+      setLoadError('')
+      const response = await axios.get(`${API_BASE_URL}/recent-jobs`, {
+        withCredentials: true
+      })
+      if (!Array.isArray(response.data?.recentJobs)) {
+        throw new Error('Recent jobs response has an invalid format.')
+      }
       setRecentJobs(response.data.recentJobs)
     } catch (err) {
-      console.log(err)
+      console.error('Failed to load recent jobs:', err)
+      setLoadError('Recent jobs are temporarily unavailable. Please try again later.')
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [])
 
   const truncateDescription = (description, maxLength) => {
     if (description.length > maxLength) {
@@ -30,12 +35,17 @@ function RecentJobs () {
 
   useEffect(() => {
     handleRecentJobs()
-  }, [])
+  }, [handleRecentJobs])
 
   
   return (
     <div className='row container-fluid'>
       <h4 className='text-center fw-bold fs-3 p-4'>Recent Jobs</h4>
+      {loading && <p className='text-center' role='status'>Loading recent jobs…</p>}
+      {!loading && loadError && <p className='text-center text-danger' role='alert'>{loadError}</p>}
+      {!loading && !loadError && recentJob.length === 0 && (
+        <p className='text-center'>No recent jobs are currently available.</p>
+      )}
       {recentJob.map((job, index) => (
         <div key={index} className='mb-3 mb-md-0 col-lg-6 col-12 p-2 shadow-4'>
           <div className='card'>

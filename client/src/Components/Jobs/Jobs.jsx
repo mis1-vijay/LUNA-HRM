@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllJobs } from '../../API/apiCalls';
 import UserContext from '../../Context/userContext';
@@ -9,15 +9,15 @@ function Jobs() {
   console.log(getJob)
   const [jobs, setJobs] = useState([]);
 
-  const handleJobs = async () => {
+  const handleJobs = useCallback(async () => {
     const response = await getAllJobs();
     setJobs(response.data.jobs);
     setGetJob(response.data.jobs)
-  };
+  }, [setGetJob]);
 
   useEffect(() => {
     handleJobs();
-  }, []);
+  }, [handleJobs]);
 
   const truncateDescription = (description, maxLength) => {
     if (description.length > maxLength) {

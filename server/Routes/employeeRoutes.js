@@ -1,6 +1,7 @@
 const express = require('express')
 const employeeRouter = express.Router()
 const {
+    employeeLogin,
     createEmployee,
     getAllEmployees,
     getEmployeeById,
@@ -10,6 +11,8 @@ const {
     getDepartmentStats
 } = require('../Controllers/employeeControllers')
 const { verifyToken, authorizeRoles } = require('../Middlewares/adminMiddleware')
+
+employeeRouter.post('/employee-login', employeeLogin)
 
 // Employee Routes
 employeeRouter.use(verifyToken)

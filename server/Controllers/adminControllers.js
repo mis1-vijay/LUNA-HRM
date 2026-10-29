@@ -69,45 +69,9 @@ const adminLogin = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' })
     }
 
-    const employeeLogin = async (req, res, next) => {
-      try {
-        const { email, password } = req.body
-        if (typeof email !== 'string' || typeof password !== 'string') {
-          return res.status(400).json({ success: false, message: 'Email and password are required.' })
-        }
-        const account = await prisma.account.findUnique({
-          where: { email: email.trim().toLowerCase() },
-          include: { employeeProfile: true }
-        })
-        if (!account || account.status !== 'ACTIVE' || account.role !== 'EMPLOYEE' ||
-          !account.employeeProfile || !(await bcrypt.compare(password, account.passwordHash))) {
-          return res.status(401).json({ success: false, message: 'Invalid email or password.' })
-        }
-        const token = jwt.sign(
-          { id: account.id, role: account.role },
-          process.env.SECRET,
-          { expiresIn: '1d' }
-        )
-        await prisma.account.update({ where: { id: account.id }, data: { lastLogin: new Date() } })
-        res.cookie('employeeId', account.id, authCookieOptions)
-        return res.status(200).json({
-          success: true,
-          message: 'Employee Login Successfully',
-          isEmployee: {
-            ...safeAccount(account),
-            employeeId: account.employeeProfile.id,
-            employeeNumber: account.employeeProfile.employeeId
-          },
-          token
-        })
-      } catch (error) {
-        return next(error)
-      }
-    }
-
     const token = jwt.sign(
       { id: account.id, role: account.role },
-      process.env.SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     )
     await prisma.account.update({ where: { id: account.id }, data: { lastLogin: new Date() } })
@@ -202,7 +166,6 @@ const logoutAdmin = (req, res) => {
 module.exports = {
   adminRegister,
   adminLogin,
-  employeeLogin,
   adminCreateJobs,
   getAllUsers,
   totalJobs,

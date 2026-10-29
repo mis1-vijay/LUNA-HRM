@@ -1,4 +1,3 @@
-import React from 'react'
 import bgImage from '../../Assets/Images/team_images.jpeg'
 import './about.scss'
 import { Link } from 'react-router-dom'

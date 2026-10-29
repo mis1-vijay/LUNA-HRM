@@ -92,7 +92,7 @@ const userLogin = async (req, res, next) => {
 
     const token = jwt.sign(
       { id: account.id, role: account.role },
-      process.env.SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     )
     await prisma.account.update({ where: { id: account.id }, data: { lastLogin: new Date() } })

@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const configuredApiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1')
+  .replace(/\/+$/, '')
+
+export const API_BASE_URL = configuredApiUrl.endsWith('/api/v1')
+  ? configuredApiUrl
+  : `${configuredApiUrl}/api/v1`
 
 export function readStoredToken(key) {
   const stored = localStorage.getItem(key)
@@ -10,6 +15,35 @@ export function readStoredToken(key) {
   } catch {
     return stored
   }
+}
+
+export function readStoredAccount() {
+  try {
+    const account = JSON.parse(localStorage.getItem('accountUser'))
+    return account && typeof account === 'object' ? account : null
+  } catch {
+    return null
+  }
+}
+
+export function storeAuthenticatedAccount(account) {
+  if (!account || typeof account !== 'object' || typeof account.role !== 'string') {
+    throw new Error('Authentication response did not contain a valid account.')
+  }
+
+  const normalizedAccount = {
+    ...account,
+    role: account.role.toUpperCase(),
+    id: account.id || account._id
+  }
+  localStorage.setItem('accountUser', JSON.stringify(normalizedAccount))
+  localStorage.setItem('accountRole', normalizedAccount.role)
+  return normalizedAccount
+}
+
+export function clearAuthenticatedAccount() {
+  localStorage.removeItem('accountUser')
+  localStorage.removeItem('accountRole')
 }
 
 export function tokenHeaders(key) {
@@ -29,32 +63,15 @@ export function apiRequestConfig(key) {
 }
 
 axios.interceptors.request.use(config => {
-  const requestUrl = config.url || ''
-  if (/^https?:\/\/(localhost|127\.0\.0\.1):5000\b/.test(requestUrl) ||
-    /^https:\/\/hrms-server-gilt\.vercel\.app\b/.test(requestUrl)) {
-    config.url = requestUrl.replace(
-      /^https?:\/\/(?:localhost|127\.0\.0\.1):5000|^https:\/\/hrms-server-gilt\.vercel\.app/,
-      API_BASE_URL
-    )
-  }
-
-  const employeeDashboard = config.url?.match(/\/api\/v1\/dashboard\/employee(?:\/[^/?]+)?/)
-  if (employeeDashboard) {
-    config.url = config.url.replace(employeeDashboard[0], '/api/v1/dashboard/employee')
-    config.headers = config.headers || {}
-    const employeeToken = readStoredToken('employeeToken')
-    if (employeeToken) config.headers.Authorization = `Bearer ${employeeToken}`
-  }
-
   const path = config.url || ''
   let tokenKey
   if (path.includes('/dashboard/employee') || path.includes('/employee-login')) {
     tokenKey = 'employeeToken'
   } else if (path.includes('/dashboard/') || path.includes('/employee/')) {
     tokenKey = 'adminToken'
-  } else if (/\/api\/v1\/(?:user-|all-jobs|getapplied-jobs|update-user)/.test(path)) {
+  } else if (/\/(?:user-|all-jobs|getapplied-jobs|update-user)/.test(path)) {
     tokenKey = 'userToken'
-  } else if (/\/api\/v1\/(?:admin-)/.test(path)) {
+  } else if (/\/admin-/.test(path)) {
     tokenKey = 'adminToken'
   }
   const token = tokenKey ? readStoredToken(tokenKey) : null

@@ -1,5 +1,5 @@
-import React, {useState} from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
     MDBBtn,
     MDBContainer,
@@ -10,7 +10,8 @@ import {
     MDBInput,
     MDBIcon
   } from 'mdb-react-ui-kit'
-  import { adminCreateJobs } from '../../../API/adminApiCalls'
+import { toast } from 'react-toastify'
+import { adminCreateJobs } from '../../../API/adminApiCalls'
 
 function CreateJobs() {
     const [jobTitle, setJobTitle] = useState('')
@@ -32,18 +33,15 @@ function CreateJobs() {
           endDate
         });
     
-        console.log(response.data);
-        
         if (response.status === 200 || response.status === 201) {
-          // Assuming a successful response status code
-          navigate('/admin-dashboard');
-          toast.success('Job created Successfully');
+          toast.success('Job created successfully')
+          navigate('/admin-dashboard')
         } else {
-          toast.error('Job Create Failed');
+          toast.error('Job creation failed.')
         }
       } catch (error) {
-        console.error('Job Create failed', error);
-        toast.error('Job Create Failed');
+        console.error('Job creation failed:', error)
+        toast.error(error.response?.data?.message || 'Job creation failed.')
       }
     };
     

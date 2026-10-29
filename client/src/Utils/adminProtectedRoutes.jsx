@@ -3,7 +3,7 @@ import RoleProtectedRoute from './RoleProtectedRoute'
 
 function ProtectedAdminRoutes() {
   return (
-    <RoleProtectedRoute roles={['ADMIN']}>
+    <RoleProtectedRoute roles={['ADMIN', 'HR_MANAGER']}>
       <Outlet />
     </RoleProtectedRoute>
   )

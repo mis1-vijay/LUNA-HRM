@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Sidebar from './Sidebar'
 import {
   MDBBtn,
@@ -32,7 +32,7 @@ function Apply () {
   const handleApply = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/v1/user-apply/${id}`,
+        `${API_BASE_URL}/user-apply/${id}`,
         {
           resume,
           address,

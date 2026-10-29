@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import Sidebar from './Sidebar'
 import {
   MDBCol,
@@ -8,12 +8,6 @@ import {
   MDBCardText,
   MDBCardBody,
   MDBCardImage,
-  MDBBtn,
-  MDBBreadcrumb,
-  MDBBreadcrumbItem,
-  MDBProgress,
-  MDBProgressBar,
-  MDBIcon,
   MDBListGroup,
   MDBListGroupItem
 } from 'mdb-react-ui-kit'
@@ -80,7 +74,6 @@ function Dashboard () {
                       fluid
                     />
 
-                    {/* <p>{`http://localhost:5000/uploads/${user.path}`}</p> */}
                     <p className='text-muted mb-1'>{user.currentJob}</p>
                     <p className='text-muted mb-4'>House 10, Canada Ontario.</p>
                     {/* <div className='d-flex justify-content-center mb-2'>

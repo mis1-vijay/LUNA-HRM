@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdminSidebar from '../Sidebar/AdminSidebar';
 import { getAllUsers, getAllJobs } from '../../../API/adminApiCalls';
 import { getAllEmployees, getDepartmentStats } from '../../../API/employeeApiCalls';
 import ReactApexChart from 'react-apexcharts';
 import { MDBIcon } from 'mdb-react-ui-kit';
+import PropTypes from 'prop-types'
 
 function AdminDashboard() {
   const [totalUsers, setTotalUsers] = useState(0);
@@ -92,6 +93,13 @@ function AdminDashboard() {
       <p className='text-center'>{title}</p>
     </div>
   );
+
+  StatCard.propTypes = {
+    icon: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    bgColor: PropTypes.string.isRequired
+  }
 
   return (
     <div className='board'>

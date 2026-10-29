@@ -4,15 +4,15 @@
 ![React + Express](https://img.shields.io/badge/Stack-React%20%2B%20Express-green?style=flat-square)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Migration%20in%20progress-orange?style=flat-square)
+![Status](https://img.shields.io/badge/Status-PostgreSQL%20%2B%20Prisma-blue?style=flat-square)
 
 ---
 
 ## 🎯 Project Overview
 
-**Luna HRM** is an evolving HR and recruitment application. The backend runtime uses PostgreSQL through Prisma. The guarded legacy-data importer reads MongoDB collections directly; the obsolete Mongoose model files have been removed.
+**Luna HRM** is an HR and recruitment application. The backend uses PostgreSQL through Prisma, with a React/Vite frontend.
 
-> **Migration status:** The source changes describe the intended Prisma-backed application, but schema validation, database setup, data import, and end-to-end workflows still require verification in the target environment. Do not use this README's feature descriptions as a production-readiness claim. Back up MongoDB before attempting import, and use reviewed migrations rather than `db push` against production data.
+> Configure and verify the target database before use. `prisma db push` is intended for development databases; use reviewed migrations for production schema changes. The test-account seed writes five privileged/test accounts to the currently configured database and should never be run against production.
 
 ### Key Highlights
 
@@ -52,7 +52,7 @@
 
 ### Relational data model
 
-The Prisma schema in `server/prisma/schema.prisma` defines accounts and roles, employee profiles, departments, designations, attendance, leave, salary, performance reviews, applicants, jobs, applications, and migration checkpoints. Legacy ObjectId values are represented as strings to preserve identifiers during import.
+The Prisma schema in `server/prisma/schema.prisma` defines accounts and roles, employee profiles, departments, designations, attendance, leave, salary, performance reviews, applicants, jobs, and applications.
 
 ---
 
@@ -196,7 +196,7 @@ POST   /api/v1/admin-login                 Admin login
 server/
 ├── prisma/
 │   ├── schema.prisma             PostgreSQL relational schema
-│   └── migrateMongoToPostgres.js Guarded legacy-data importer
+│   └── seedTestUsers.js          Local test-account provisioning
 ├── Controllers/
 │   ├── dashboardControllers.js   ✅ New
 │   ├── employeeControllers.js    ✅ Complete
@@ -302,14 +302,14 @@ client/src/
 
 ### Complete Schema Definitions
 
-See [LUNA_HRM_DOCUMENTATION.md](LUNA_HRM_DOCUMENTATION.md) for detailed schema information.
+See [the Prisma schema](server/prisma/schema.prisma) for the relational model definitions.
 
 ---
 
 ## 🔐 Security Features
 
 - JWT token verification with account lookup and database-backed role checks
-- Password hashing for newly provisioned credentials; imported password hashes retain their legacy format
+- Bcrypt password hashing for account credentials
 - Role-protected API and dashboard routes
 - Bootstrap admin creation is guarded by a one-time key
 
@@ -340,7 +340,6 @@ Security behavior and all role-specific workflows still require integration test
 ✅ Express.js 4.x           - Server Framework
 ✅ PostgreSQL               - Database
 ✅ Prisma 6                 - ORM
-✅ Mongoose                 - Legacy import utility only
 ✅ JWT                      - Authentication
 ✅ Bcrypt                   - Password Hashing
 ✅ Nodemailer               - Email (Ready)
@@ -413,11 +412,8 @@ curl -X GET http://localhost:5000/api/v1/dashboard/employee \
 
 ### Available Guides
 
-1. **[LUNA_HRM_DOCUMENTATION.md](LUNA_HRM_DOCUMENTATION.md)** - Complete system guide
-2. **[LUNA_QUICKSTART.md](LUNA_QUICKSTART.md)** - Quick start guide
-3. **[LUNA_TRANSFORMATION_COMPLETE.md](LUNA_TRANSFORMATION_COMPLETE.md)** - Transformation details
-4. **[INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md)** - Integration patterns
-5. **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Quick API reference
+- [Quick start](LUNA_QUICKSTART.md)
+- [Prisma schema](server/prisma/schema.prisma)
 
 ---
 
@@ -589,7 +585,7 @@ git push heroku main
 
 ```
 Production PostgreSQL: Use a managed provider such as Supabase
-JWT Secret: Configure a strong SECRET value
+JWT Secret: Configure a random JWT_SECRET value with at least 32 characters
 API URL: Production backend URL
 CORS Origins: Production domains
 ```
@@ -598,7 +594,7 @@ CORS Origins: Production domains
 
 ## 🎓 Learning Path
 
-1. **Understand Architecture** - Read LUNA_HRM_DOCUMENTATION.md
+1. **Understand Architecture** - Read this guide
 2. **Quick Start** - Follow LUNA_QUICKSTART.md
 3. **Explore Dashboards** - Visit each dashboard in browser
 4. **Review API** - Test endpoints with Postman

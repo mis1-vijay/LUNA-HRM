@@ -1,22 +1,15 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import menuIcon from '../../Assets/Images/icon-menu.svg'
 import closeIcon from '../../Assets/Images/icon-close.svg'
 import './header.scss'
-import { AiOutlineClose } from 'react-icons/ai'
 import { Link, useNavigate } from 'react-router-dom'
 import UserContext from '../../Context/userContext'
 
 function Header () {
   const [toggle, setToggle] = useState(false) 
-  const [authUser, setAuthUser] = useState(JSON.parse(localStorage.getItem('userToken')))
-  const { logout } = useContext(UserContext)
-  console.log(authUser)
+  const { logout, user } = useContext(UserContext)
 
   const navigate = useNavigate()
-
-  useEffect(() => {
-     
-  }, [authUser])
 
   const handleLogout = async () => {
     await logout()
@@ -28,13 +21,11 @@ function Header () {
       <div id='navcard' className={toggle ? 'show' : ''}>
         <img id='close' src={closeIcon} onClick={() => setToggle(false)}></img>
         <ul>
-          <Link to='/about'>
-            <a href='#about'>About</a>
-          </Link>
+          <a href='#about' onClick={() => setToggle(false)}>About</a>
           <li>
             <a href='#contact'>Contact Us</a>
           </li>
-          {authUser ? (
+          {user ? (
              <>
                 <Link to='dashboard'>Dashboard</Link>
               <button className='btn btn-danger' onClick={handleLogout}>Logout</button>
@@ -61,7 +52,7 @@ function Header () {
             <li>
               <a href='#contact'>Contact us</a>
             </li>
-            {authUser ? (
+            {user ? (
              <>
                 <Link to='dashboard'>Dashboard</Link>
               <button className='btn btn-danger' onClick={handleLogout}>Logout</button>

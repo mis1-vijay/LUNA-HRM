@@ -22,7 +22,7 @@ Add these keys to `server/.env` without replacing existing values. Use your own 
 PORT=5000
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:6543/DATABASE?pgbouncer=true"
 DIRECT_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE"
-SECRET="replace-with-a-long-random-jwt-secret"
+JWT_SECRET="replace-with-a-random-secret-of-at-least-32-characters"
 CLIENT_ORIGIN="http://localhost:5173"
 NODE_ENV=development
 ```
@@ -50,7 +50,7 @@ npm start
 
 `prisma:push` is intended for a new/empty development database. Inspect any existing Supabase database before applying schema changes. For a production database, use reviewed version-controlled Prisma migrations instead of `db push`.
 
-The MongoDB importer is an explicit opt-in utility. First create and verify a MongoDB backup, configure `MONGODB_URL`, and run a count-only audit with `npm run prisma:migrate-mongo`. Execute writes only after setting `MONGO_MIGRATION_BACKUP_CONFIRMED=YES` and running `npm run prisma:migrate-mongo -- --execute`. Unlinked legacy `applyForJbs` documents are reported but not imported because their user/job relationships are unavailable.
+For local development only, `npm run prisma:seed-test-users` creates one account for each role in the database configured by `DATABASE_URL`. It stores unique generated credentials in the ignored `server/.env.test-users.local` file. Do not run this command against production or a shared database.
 
 ✅ Backend starts only after Prisma connects to PostgreSQL.
 
@@ -208,7 +208,7 @@ Luna HRM/
 ├── server/
 │   ├── prisma/
 │   │   ├── schema.prisma
-│   │   └── migrateMongoToPostgres.js
+│   │   └── seedTestUsers.js
 │   ├── Controllers/
 │   │   ├── dashboardControllers.js (NEW)
 │   │   ├── employeeControllers.js
@@ -236,11 +236,9 @@ Luna HRM/
 │   │   │   └── employeeApiCalls.js
 │   │   └── ... (other components)
 │
-├── Documentation/
-│   ├── LUNA_HRM_DOCUMENTATION.md (MAIN GUIDE)
-│   ├── LUNA_TRANSFORMATION_COMPLETE.md
-│   ├── QUICK_REFERENCE.md
-│   └── ... (other docs)
+├── LUNA_HRM_README.md
+├── LUNA_QUICKSTART.md
+└── README.md
 ```
 
 ---
@@ -316,9 +314,9 @@ Run `npm run prisma:validate` and confirm `DATABASE_URL` and `DIRECT_URL` are se
 Check that the Supabase project is active and its connection settings match the URL type
 ```
 
-### Migration readiness
+### Verification status
 
-The Prisma schema, API changes, and Mongo importer have not been verified against a real database in this guide. Do not treat the feature matrix or dashboard descriptions below as proof that every UI workflow is complete. Back up MongoDB and inspect the importer output before any write run. Use `prisma db push` only for a new development database; production schema changes require reviewed migrations.
+The Prisma schema validates, and the configured database connection has passed a health check. Verify all role-specific workflows in a test environment before production use. Use `prisma db push` only for development databases; production schema changes require reviewed migrations.
 
 ---
 
@@ -458,19 +456,18 @@ The Prisma schema, API changes, and Mongo importer have not been verified agains
 
 ## Support & Resources
 
-- **Documentation**: See LUNA_HRM_DOCUMENTATION.md
+- **Documentation**: See LUNA_HRM_README.md
 - **API Reference**: Check endpoints in this guide
-- **Troubleshooting**: See LUNA_HRM_DOCUMENTATION.md
-- **Examples**: Check INTEGRATION_GUIDE.md
+- **Troubleshooting**: See the database and authentication troubleshooting sections below
 
 ---
 
 ## Getting Help
 
-1. **Check Documentation**: LUNA_HRM_DOCUMENTATION.md
+1. **Check Documentation**: LUNA_HRM_README.md
 2. **Review Error Messages**: Check browser console
 3. **Check Logs**: Review terminal output
-4. **Database Issues**: Verify MongoDB connection
+4. **Database Issues**: Verify PostgreSQL connection and Prisma configuration
 5. **API Issues**: Test with Postman
 6. **UI Issues**: Clear cache and refresh
 

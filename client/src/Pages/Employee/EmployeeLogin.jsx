@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { employeeLogin } from '../../API/adminApiCalls'
+import UserContext from '../../Context/userContext'
 
 function EmployeeLogin() {
   const [email, setEmail] = useState('')
@@ -8,13 +9,15 @@ function EmployeeLogin() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
+  const { setEmployee } = useContext(UserContext)
 
   const handleSubmit = async event => {
     event.preventDefault()
     setError('')
     setSubmitting(true)
     try {
-      await employeeLogin({ email, password })
+      const response = await employeeLogin({ email, password })
+      setEmployee(response.data.isEmployee)
       navigate('/employee-dashboard')
     } catch (loginError) {
       setError(loginError.response?.data?.message || 'Unable to sign in.')

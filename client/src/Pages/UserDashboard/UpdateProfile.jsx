@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react'
-import { useNavigate, Link, useParams } from 'react-router-dom'
+import { useState, useContext } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { API_BASE_URL } from '../../API/apiClient'
 import {
@@ -38,7 +38,7 @@ function UpdateProfile () {
   const updateProfile = async () => {
     try {
       const response = await axios.put(
-        `${API_BASE_URL}/api/v1/update-user/${id}`,
+        `${API_BASE_URL}/update-user/${id}`,
         {
           email,
           name,

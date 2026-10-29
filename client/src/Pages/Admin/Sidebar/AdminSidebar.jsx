@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import '../../UserDashboard/slidebar.scss'
 import {
@@ -17,7 +17,6 @@ import {
   MDBCollapse,
   MDBRipple,
   MDBBadge,
-  MDBInput,
   MDBListGroup,
   MDBDropdownLink,
   MDBListGroupItem
@@ -26,7 +25,7 @@ import UserContext from '../../../Context/userContext'
 
 function AdminSidebar() {
   const [showShow, setShowShow] = useState(false)
-  const { logoutAdmin, adminToken } = useContext(UserContext);
+  const { logoutAdmin } = useContext(UserContext);
 
   const toggleShow = () => setShowShow(!showShow)
   const navigate = useNavigate()

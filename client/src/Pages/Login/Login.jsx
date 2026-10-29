@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   MDBBtn,
@@ -37,8 +37,7 @@ function Login () {
         toast.success('Login Successfully')
       }
     } catch (error) {
-      console.error('Login failed', error)
-      toast.error('Login Failed')
+      toast.error(error.response?.data?.message || 'Login Failed')
     }
   }
 

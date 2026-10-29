@@ -1,6 +1,12 @@
-import axios, { API_BASE_URL, apiRequestConfig, tokenHeaders } from './apiClient'
+import axios, {
+  API_BASE_URL,
+  apiRequestConfig,
+  clearAuthenticatedAccount,
+  storeAuthenticatedAccount,
+  tokenHeaders
+} from './apiClient'
 
-const API_URL = `${API_BASE_URL}/api/v1`
+const API_URL = API_BASE_URL
 
 export const userRegister = payload =>
   axios.post(`${API_URL}/user-register`, payload, { withCredentials: true })
@@ -9,7 +15,7 @@ export const userLogin = async payload => {
   const response = await axios.post(`${API_URL}/user-login`, payload, { withCredentials: true })
   localStorage.removeItem('adminToken')
   localStorage.removeItem('employeeToken')
-  localStorage.setItem('accountRole', response.data.isUser.role)
+  storeAuthenticatedAccount(response.data.isUser)
   localStorage.setItem('userToken', JSON.stringify(response.data.token))
   return response
 }
@@ -38,5 +44,5 @@ export const updateUser = (id, payload) =>
 export const userLogout = () =>
   axios.post(`${API_URL}/user-logout`, null, { withCredentials: true }).finally(() => {
     localStorage.removeItem('userToken')
-    localStorage.removeItem('accountRole')
+    clearAuthenticatedAccount()
   })

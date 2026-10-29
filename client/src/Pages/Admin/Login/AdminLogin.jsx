@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   MDBBtn,
@@ -41,8 +41,7 @@ function AdminLogin() {
           toast.success('Admin Login Successfully')
         }
       } catch (error) {
-        console.error('Admin Login failed', error)
-        toast.error('Admin Login Failed')
+        toast.error(error.response?.data?.message || 'Admin Login Failed')
       }
     }
 

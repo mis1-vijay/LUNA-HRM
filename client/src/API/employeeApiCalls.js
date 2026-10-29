@@ -1,6 +1,6 @@
 import axios, { API_BASE_URL, apiRequestConfig } from './apiClient'
 
-const API_URL = `${API_BASE_URL}/api/v1`
+const API_URL = API_BASE_URL
 const config = () => apiRequestConfig(localStorage.getItem('adminToken') ? 'adminToken' : 'employeeToken')
 
 export const createEmployee = payload =>

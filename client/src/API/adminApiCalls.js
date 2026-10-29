@@ -1,6 +1,11 @@
-import axios, { API_BASE_URL, apiRequestConfig } from './apiClient'
+import axios, {
+  API_BASE_URL,
+  apiRequestConfig,
+  clearAuthenticatedAccount,
+  storeAuthenticatedAccount
+} from './apiClient'
 
-const API_URL = `${API_BASE_URL}/api/v1`
+const API_URL = API_BASE_URL
 
 export const adminRegister = (payload, bootstrapKey) =>
   axios.post(`${API_URL}/admin-register`, payload, {
@@ -13,7 +18,7 @@ export const adminLogin = async payload => {
   localStorage.removeItem('userToken')
   localStorage.removeItem('employeeToken')
   localStorage.setItem('adminToken', JSON.stringify(response.data.token))
-  localStorage.setItem('accountRole', response.data.isAdmin.role)
+  storeAuthenticatedAccount(response.data.isAdmin)
   return response
 }
 
@@ -22,7 +27,7 @@ export const employeeLogin = async payload => {
   localStorage.removeItem('userToken')
   localStorage.removeItem('adminToken')
   localStorage.setItem('employeeToken', JSON.stringify(response.data.token))
-  localStorage.setItem('accountRole', response.data.isEmployee.role)
+  storeAuthenticatedAccount(response.data.isEmployee)
   return response
 }
 
@@ -37,3 +42,10 @@ export const getAllJobs = () =>
 
 export const adminCreateJobs = payload =>
   axios.post(`${API_URL}/admin-create-jobs`, payload, apiRequestConfig('adminToken'))
+
+export const adminLogout = () =>
+  axios.post(`${API_URL}/admin-logout`, null, { withCredentials: true }).finally(() => {
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('employeeToken')
+    clearAuthenticatedAccount()
+  })

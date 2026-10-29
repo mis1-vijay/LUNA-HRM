@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     MDBCard,
     MDBCardBody,
@@ -16,7 +16,7 @@ import {
 } from 'mdb-react-ui-kit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from '../../../API/apiClient';
+import { API_BASE_URL, readStoredToken } from '../../../API/apiClient';
 
 const LunaManagerDashboard = () => {
     const [dashboardData, setDashboardData] = useState(null);
@@ -29,9 +29,9 @@ const LunaManagerDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const token = JSON.parse(localStorage.getItem('adminToken'));
+            const token = readStoredToken('adminToken');
             const response = await axios.get(
-                `${API_BASE_URL}/api/v1/dashboard/manager`,
+                `${API_BASE_URL}/dashboard/manager`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -184,7 +184,7 @@ const LunaManagerDashboard = () => {
                 <MDBCol lg="4" className="mb-3">
                     <MDBCard className="shadow-sm border-0">
                         <MDBCardBody>
-                            <h5 className="fw-bold mb-4">Today's Attendance</h5>
+                            <h5 className="fw-bold mb-4">Today&apos;s Attendance</h5>
                             <MDBListGroup flush>
                                 <MDBListGroupItem className="px-0">
                                     <div className="d-flex justify-content-between align-items-center">
